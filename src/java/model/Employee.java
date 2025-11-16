@@ -8,7 +8,8 @@ import java.util.Date;
 
 public class Employee {
     private int employeeId;
-    private String name;
+    private String firstName;
+    private String lastName;
     private String email;
     private String phone;
     private String role;
@@ -17,9 +18,10 @@ public class Employee {
 
     public Employee() {}
 
-    public Employee(int employeeId, String name, String email, String phone, String role, double salary, Date hireDate) {
+    public Employee(int employeeId, String firstName, String lastName, String email, String phone, String role, double salary, Date hireDate) {
         this.employeeId = employeeId;
-        this.name = name;
+       this.firstName = firstName;
+       this.lastName = lastName;
         this.email = email;
         this.phone = phone;
         this.role = role;
@@ -30,8 +32,11 @@ public class Employee {
     public int getEmployeeId() { return employeeId; }
     public void setEmployeeId(int employeeId) { this.employeeId = employeeId; }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    
+      public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
