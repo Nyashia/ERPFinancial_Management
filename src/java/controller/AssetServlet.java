@@ -1,89 +1,114 @@
 package controller;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
-
-
+import dao.AssetDAO;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.io.PrintWriter;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.sql.SQLException;
+import java.util.List;
+import model.Asset;
 
-/**
- *
- * @author Nyash
- */
-@WebServlet(name = "AssetServlet", urlPatterns = {"/AssetServlet"})
 public class AssetServlet extends HttpServlet {
+    private AssetDAO assetsDAO;
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+    public void init() {
+        assetsDAO = new AssetDAO();
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet AssetServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet AssetServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+        String action = request.getServletPath();
+
+        try {
+            switch (action) {
+                case "/new-asset":
+                    showNewForm(request, response);
+                    break;
+                case "/insert-asset":
+                    insertAsset(request, response);
+                    break;
+                case "/delete-asset":
+                    deleteAsset(request, response);
+                    break;
+                case "/edit-asset":
+                    showEditForm(request, response);
+                    break;
+                case "/update-asset":
+                    updateAsset(request, response);
+                    break;
+                default:
+                    listAssets(request, response);
+                    break;
+            }
+        } catch (SQLException ex) {
+            throw new ServletException(ex);
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
+    // List all assets
+    private void listAssets(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        List<Asset> listAssets = assetsDAO.selectAllAssets();
+        request.setAttribute("listAssets", listAssets);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("assets.jsp");
+        dispatcher.forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    private void showNewForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("add-asset.jsp");
+        dispatcher.forward(request, response);
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+    private void insertAsset(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+        String name = request.getParameter("name");
+        java.sql.Date purchaseDate = java.sql.Date.valueOf(request.getParameter("purchase_date"));
+        double cost = Double.parseDouble(request.getParameter("cost"));
+        double depreciation = Double.parseDouble(request.getParameter("depreciation"));
 
+        Asset newAsset = new Asset();
+        newAsset.setName(name);
+        newAsset.setPurchaseDate(purchaseDate);
+        newAsset.setCost(cost);
+        newAsset.setDepreciation(depreciation);
+
+        assetsDAO.insertAsset(newAsset);
+        response.sendRedirect("assets");
+    }
+
+    private void showEditForm(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        Asset existingAsset = assetsDAO.selectAsset(id);
+        request.setAttribute("asset", existingAsset);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("edit-asset.jsp");
+        dispatcher.forward(request, response);
+    }
+
+    private void updateAsset(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        String name = request.getParameter("name");
+        java.sql.Date purchaseDate = java.sql.Date.valueOf(request.getParameter("purchase_date"));
+        double cost = Double.parseDouble(request.getParameter("cost"));
+        double depreciation = Double.parseDouble(request.getParameter("depreciation"));
+
+        Asset asset = new Asset();
+        asset.setAssetId(id);
+        asset.setName(name);
+        asset.setPurchaseDate(purchaseDate);
+        asset.setCost(cost);
+        asset.setDepreciation(depreciation);
+
+        assetsDAO.updateAsset(asset);
+        response.sendRedirect("assets");
+    }
+
+    private void deleteAsset(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        assetsDAO.deleteAsset(id);
+        response.sendRedirect("assets");
+    }
 }
