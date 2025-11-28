@@ -1,0 +1,13 @@
+:root{
+    --yellow: #f7d78c;
+    --green: #c6d0b9;
+    --purple: #a7adff;
+    --backgroundColour: #f8f7f2;
+    --black:#2c2c2c;
+}
+
+body{
+    font-family: sans-serif;
+    background-color: var(--backgroundColour);
+    padding: 5px;
+}

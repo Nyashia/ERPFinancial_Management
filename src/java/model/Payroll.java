@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 import java.util.Date;
@@ -11,35 +7,76 @@ public class Payroll {
     private int employeeId;
     private Date paymentDate;
     private double amount;
-    private String status; // Paid/Unpaid
+    private double royalties;
+    private String status;
     private String description;
 
     public Payroll() {}
 
-    public Payroll(int payrollId, int employeeId, Date paymentDate, double amount, String status, String description) {
+    public Payroll(int payrollId, int employeeId, Date paymentDate, double amount,
+                   double royalties, String status, String description) {
         this.payrollId = payrollId;
         this.employeeId = employeeId;
         this.paymentDate = paymentDate;
         this.amount = amount;
+        this.royalties = royalties;
         this.status = status;
         this.description = description;
     }
 
-    public int getPayrollId() { return payrollId; }
-    public void setPayrollId(int payrollId) { this.payrollId = payrollId; }
+    public int getPayrollId() {
+        return payrollId;
+    }
 
-    public int getEmployeeId() { return employeeId; }
-    public void setEmployeeId(int employeeId) { this.employeeId = employeeId; }
+    public void setPayrollId(int payrollId) {
+        this.payrollId = payrollId;
+    }
 
-    public Date getPaymentDate() { return paymentDate; }
-    public void setPaymentDate(Date paymentDate) { this.paymentDate = paymentDate; }
+    public int getEmployeeId() {
+        return employeeId;
+    }
 
-    public double getAmount() { return amount; }
-    public void setAmount(double amount) { this.amount = amount; }
+    public void setEmployeeId(int employeeId) {
+        this.employeeId = employeeId;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public Date getPaymentDate() {
+        return paymentDate;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public void setPaymentDate(Date paymentDate) {
+        this.paymentDate = paymentDate;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public double getRoyalties() {
+        return royalties;
+    }
+
+    public void setRoyalties(double royalties) {
+        this.royalties = royalties;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }
