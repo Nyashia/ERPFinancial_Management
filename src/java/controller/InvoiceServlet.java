@@ -4,84 +4,73 @@
  */
 package controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import dao.InvoiceDAO;
+import model.Invoice;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author Nyash
- */
-@WebServlet(name = "InvoiceServlet", urlPatterns = {"/InvoiceServlet"})
-public class InvoiceServlet extends HttpServlet {
+import java.io.IOException;
+import java.util.List;
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+@WebServlet("/invoices/*")
+public class InvoiceServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private InvoiceDAO invoiceDAO;
+
+    public void init() {
+        invoiceDAO = new InvoiceDAO();
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet InvoiceServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet InvoiceServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+        String action = request.getPathInfo();
+        if (action == null) action = "";
+
+        switch (action) {
+            case "/new":
+                request.getRequestDispatcher("/jsp/invoice.jsp").forward(request, response);
+                break;
+            case "/edit":
+                int idEdit = Integer.parseInt(request.getParameter("id"));
+                Invoice invoiceEdit = invoiceDAO.selectInvoice(idEdit);
+                request.setAttribute("invoice", invoiceEdit);
+                request.getRequestDispatcher("/jsp/invoice.jsp").forward(request, response);
+                break;
+            case "/delete":
+                int idDelete = Integer.parseInt(request.getParameter("id"));
+                invoiceDAO.deleteInvoice(idDelete);
+                response.sendRedirect(request.getContextPath() + "/invoices");
+                break;
+            default: // list all
+                List<Invoice> listInvoice = invoiceDAO.selectAllInvoices();
+                request.setAttribute("listInvoice", listInvoice);
+                request.getRequestDispatcher("/jsp/invoice.jsp").forward(request, response);
+                break;
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
-
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        int invoiceId = request.getParameter("invoiceId") != null ? Integer.parseInt(request.getParameter("invoiceId")) : 0;
+        int supplierId = Integer.parseInt(request.getParameter("relatedSupplierId"));
+        double amount = Double.parseDouble(request.getParameter("amount"));
+        String status = request.getParameter("status");
+        java.sql.Date issueDate = java.sql.Date.valueOf(request.getParameter("issueDate"));
+        java.sql.Date dueDate = java.sql.Date.valueOf(request.getParameter("dueDate"));
+
+        Invoice invoice = new Invoice(invoiceId, supplierId, amount, status, issueDate, dueDate);
+
+        if (invoiceId == 0) {
+            invoiceDAO.insertInvoice(invoice);
+        } else {
+            invoiceDAO.updateInvoice(invoice);
+        }
+
+        response.sendRedirect(request.getContextPath() + "/invoices");
     }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
 }
+

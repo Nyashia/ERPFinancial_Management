@@ -4,84 +4,117 @@
  */
 package controller;
 
+import dao.SupplierDAO;
+import model.Supplier;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author Nyash
- */
-@WebServlet(name = "SupplierServlet", urlPatterns = {"/SupplierServlet"})
+@WebServlet("/supplier")
 public class SupplierServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private SupplierDAO supplierDAO;
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+    public void init() {
+        supplierDAO = new SupplierDAO();
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet SupplierServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet SupplierServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+        String action = request.getParameter("action");
+        if (action == null) action = "";
+
+        switch (action) {
+            case "new":
+                showNewForm(request, response);
+                break;
+            case "edit":
+                showEditForm(request, response);
+                break;
+            case "delete":
+                deleteSupplier(request, response);
+                break;
+            default:
+                listSuppliers(request, response);
+                break;
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
-
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        String action = request.getParameter("action");
+        if (action == null) action = "";
+
+        switch (action) {
+            case "insert":
+                insertSupplier(request, response);
+                break;
+            case "update":
+                updateSupplier(request, response);
+                break;
+            default:
+                response.sendRedirect("supplier");
+                break;
+        }
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+    private void listSuppliers(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        List<Supplier> list = supplierDAO.selectAllSuppliers();
+        request.setAttribute("listSupplier", list);
+        request.getRequestDispatcher("supplier.jsp").forward(request, response);
+    }
 
+    private void showNewForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.getRequestDispatcher("supplier-form.jsp").forward(request, response);
+    }
+
+    private void showEditForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        Supplier supplier = supplierDAO.selectSupplier(id);
+        request.setAttribute("supplier", supplier);
+        request.getRequestDispatcher("supplier-form.jsp").forward(request, response);
+    }
+
+    private void insertSupplier(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        String name = request.getParameter("name");
+        String contactPerson = request.getParameter("contactPerson");
+        String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        String address = request.getParameter("address");
+        String description = request.getParameter("description");
+
+        Supplier supplier = new Supplier(0, name, email, phone, address);
+        supplierDAO.insertSupplier(supplier);
+        response.sendRedirect("supplier");
+    }
+
+    private void updateSupplier(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        String name = request.getParameter("name");
+        String contactPerson = request.getParameter("contactPerson");
+        String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        String address = request.getParameter("address");
+        String description = request.getParameter("description");
+
+        Supplier supplier = new Supplier(id, name, email, phone, address);
+        supplierDAO.updateSupplier(supplier);
+        response.sendRedirect("supplier");
+    }
+
+    private void deleteSupplier(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        supplierDAO.deleteSupplier(id);
+        response.sendRedirect("supplier");
+    }
 }

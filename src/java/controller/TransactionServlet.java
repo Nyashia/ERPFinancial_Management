@@ -4,8 +4,8 @@
  */
 package controller;
 
-import dao.PayrollDAO;
-import model.Payroll;
+import dao.TransactionDAO;
+import model.Transaction;
 import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
@@ -15,16 +15,15 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/payroll")
-public class PayrollServlet extends HttpServlet {
+@WebServlet("/transaction")
+public class TransactionServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private PayrollDAO payrollDAO;
+    private TransactionDAO transactionDAO;
 
     public void init() {
-        payrollDAO = new PayrollDAO();
+        transactionDAO = new TransactionDAO();
     }
 
-    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
@@ -38,10 +37,10 @@ public class PayrollServlet extends HttpServlet {
                 showEditForm(request, response);
                 break;
             case "delete":
-                deletePayroll(request, response);
+                deleteTransaction(request, response);
                 break;
             default:
-                listPayroll(request, response);
+                listTransactions(request, response);
                 break;
         }
     }
@@ -53,70 +52,68 @@ public class PayrollServlet extends HttpServlet {
 
         switch (action) {
             case "insert":
-                insertPayroll(request, response);
+                insertTransaction(request, response);
                 break;
             case "update":
-                updatePayroll(request, response);
+                updateTransaction(request, response);
                 break;
             default:
-                response.sendRedirect("payroll");
+                response.sendRedirect("transaction");
                 break;
         }
     }
 
-    private void listPayroll(HttpServletRequest request, HttpServletResponse response)
+    private void listTransactions(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<Payroll> list = payrollDAO.selectAllPayroll();
-        request.setAttribute("listPayroll", list);
-        request.getRequestDispatcher("payroll.jsp").forward(request, response);
+        List<Transaction> list = transactionDAO.selectAllTransactions();
+        request.setAttribute("listTransaction", list);
+        request.getRequestDispatcher("transaction.jsp").forward(request, response);
     }
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("payroll-form.jsp").forward(request, response);
+        request.getRequestDispatcher("transaction-form.jsp").forward(request, response);
     }
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-        Payroll payroll = payrollDAO.selectPayroll(id);
-        request.setAttribute("payroll", payroll);
-        request.getRequestDispatcher("payroll-form.jsp").forward(request, response);
+        Transaction transaction = transactionDAO.selectTransaction(id);
+        request.setAttribute("transaction", transaction);
+        request.getRequestDispatcher("transaction-form.jsp").forward(request, response);
     }
 
-    private void insertPayroll(HttpServletRequest request, HttpServletResponse response)
+    private void insertTransaction(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        int employeeId = Integer.parseInt(request.getParameter("employeeId"));
-        Date paymentDate = Date.valueOf(request.getParameter("paymentDate"));
+        String type = request.getParameter("type");
         double amount = Double.parseDouble(request.getParameter("amount"));
-        double royalties = Double.parseDouble(request.getParameter("royalties"));
-        String status = request.getParameter("status");
+        String source = request.getParameter("source");
+        Date date = Date.valueOf(request.getParameter("date"));
         String description = request.getParameter("description");
 
-        Payroll payroll = new Payroll(0, employeeId, paymentDate, amount, royalties, status, description);
-        payrollDAO.insertPayroll(payroll);
-        response.sendRedirect("payroll");
+        Transaction transaction = new Transaction(0, type, amount, source, date, description);
+        transactionDAO.insertTransaction(transaction);
+        response.sendRedirect("transaction");
     }
 
-    private void updatePayroll(HttpServletRequest request, HttpServletResponse response)
+    private void updateTransaction(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-        int employeeId = Integer.parseInt(request.getParameter("employeeId"));
-        Date paymentDate = Date.valueOf(request.getParameter("paymentDate"));
+        String type = request.getParameter("type");
         double amount = Double.parseDouble(request.getParameter("amount"));
-        double royalties = Double.parseDouble(request.getParameter("royalties"));
-        String status = request.getParameter("status");
+        String source = request.getParameter("source");
+        Date date = Date.valueOf(request.getParameter("date"));
         String description = request.getParameter("description");
 
-        Payroll payroll = new Payroll(id, employeeId, paymentDate, amount, royalties, status, description);
-        payrollDAO.updatePayroll(payroll);
-        response.sendRedirect("payroll");
+        Transaction transaction = new Transaction(id, type, amount, source, date, description);
+        transactionDAO.updateTransaction(transaction);
+        response.sendRedirect("transaction");
     }
 
-    private void deletePayroll(HttpServletRequest request, HttpServletResponse response)
+    private void deleteTransaction(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-        payrollDAO.deletePayroll(id);
-        response.sendRedirect("payroll");
+        transactionDAO.deleteTransaction(id);
+        response.sendRedirect("transaction");
     }
 }

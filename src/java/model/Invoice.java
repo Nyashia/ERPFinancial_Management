@@ -8,38 +8,29 @@ import java.util.Date;
 
 public class Invoice {
     private int invoiceId;
-    private String type; // 'AP' for supplier, 'ROYALTY' for author
-    private Integer relatedSupplierId; // nullable if type = ROYALTY
-    private String relatedAuthor;      // nullable if type = AP
     private double amount;
     private String status; // Paid / Unpaid
+    private int relatedSupplierId; // supplier this invoice is for
     private Date issueDate;
     private Date dueDate;
 
     public Invoice() {}
 
-    public Invoice(int invoiceId, String type, Integer relatedSupplierId, String relatedAuthor, double amount, String status, Date issueDate, Date dueDate) {
+    public Invoice(int invoiceId, int relatedSupplierId, double amount, String status, Date issueDate, Date dueDate) {
         this.invoiceId = invoiceId;
-        this.type = type;
         this.relatedSupplierId = relatedSupplierId;
-        this.relatedAuthor = relatedAuthor;
         this.amount = amount;
         this.status = status;
         this.issueDate = issueDate;
         this.dueDate = dueDate;
     }
 
+    // Getters and Setters
     public int getInvoiceId() { return invoiceId; }
     public void setInvoiceId(int invoiceId) { this.invoiceId = invoiceId; }
 
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
-
-    public Integer getRelatedSupplierId() { return relatedSupplierId; }
-    public void setRelatedSupplierId(Integer relatedSupplierId) { this.relatedSupplierId = relatedSupplierId; }
-
-    public String getRelatedAuthor() { return relatedAuthor; }
-    public void setRelatedAuthor(String relatedAuthor) { this.relatedAuthor = relatedAuthor; }
+    public int getRelatedSupplierId() { return relatedSupplierId; }
+    public void setRelatedSupplierId(int relatedSupplierId) { this.relatedSupplierId = relatedSupplierId; }
 
     public double getAmount() { return amount; }
     public void setAmount(double amount) { this.amount = amount; }
@@ -52,24 +43,5 @@ public class Invoice {
 
     public Date getDueDate() { return dueDate; }
     public void setDueDate(Date dueDate) { this.dueDate = dueDate; }
-
-    public void getRelatedSupplierId(int aInt) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public void getRelatedAuthor(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public void getStatus(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public void getIssueDate(java.sql.Date date) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public void getDueDate(java.sql.Date date) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
 }
+
